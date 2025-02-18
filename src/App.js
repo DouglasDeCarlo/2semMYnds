@@ -1,44 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
-import { useEffect, useeffect, useState, usestate } from 'react';
-import FunctionSimples from './componentes/exemplos/FunctionSimples.jsx';
-import FunctionDupla from './componentes/exemplos/FunctonDupla.jsx';
-import Botao from './componentes/Button/Botao.jsx';
+import React, { useState } from 'react'
+import { useGetAPIDATA } from './hooks/getAPIDATA';
 
 function App() {
-  const [contador, setContador] = useState(0);
-  const [logado, setlogado] = useState(false);
+  const [sorveteNome, setSorveteNome] = useState('');
+  const [sorveteDigitado, setSorveteDigitado] = useState('');
+  const { sorveteData, loading, error } = useGetAPIDATA(sorveteNome);
 
-  useEffect(() => {
-    console.log("useEffect chamado")
-    setContador(contador + 1);
-  }, [logado])
-
-  const logar = () => {
-    setlogado(true);
+  const handleInputChange = (e) => {
+    setSorveteDigitado(e.target.value);
   }
-
-  const deslogar = () => {
-    setlogado(false);
+  function BuscarSorverte() {
+    setSorveteNome(sorveteDigitado);
+    
   }
 
   return (
-    <div className="App">
-      <FunctionSimples></FunctionSimples>
-      <FunctionDupla></FunctionDupla>
+    <div>
+      <input
+        type="text"
+        name="sorvete"
+        id="sorvete"
+        placeholder='Nome do Sorvete'
+        value={sorveteDigitado}
+        onChange={handleInputChange}
+      />
+      <button onClick={() => BuscarSorverte()}>Buscar Sorvete</button>
 
-      <h1> useEffect foi chamado {contador} vezes</h1>
-      {logado ? <p>Logado</p> : <p> Deslogado </p>}
+      {loading && <p>Carregando...</p>}
 
-      <Botao tarefa={logar} classe="botao green">Logar</Botao>
-      <Botao tarefa={deslogar} classe="botao red">Deslogar</Botao>
-      <hr />
-      <button onClick={logar}> Logar </button>
-      <button onClick={deslogar}> Deslogar </button>
+      {error && <p>Erro ao buscar sorvete. Erro: {error}</p>}
+
+      {Array.isArray(sorveteData) ? (
+        <div>
+          {sorveteData.map((sorvete) => (
+            <h1 key={sorvete.mal_id}>{sorvete.title}</h1>
+          ))}
+        </div>
+      ) : (
+        sorveteData && <h2>Nenhum sorvete com este nome</h2>
+      )}
+
     </div>
-  );
+  )
 }
 
 export default App
-
 
